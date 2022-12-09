@@ -16,30 +16,7 @@
     <br>
     <div class="translation">
         <?php
-            if(isset($_POST['findWord'])){
-                if(!isset($_POST['word']) || empty($_POST['word'])){
-                    echo "<p>";
-                    echo "Вы не ввели слово!";
-                    echo "</p>";
-                }
-                else{
-                    require_once("db_connect.php");
-                    $word = $_POST['word'];
-                    
-                    $sql = "SELECT meaning FROM words WHERE word = :word";
-                    $res = $db->prepare($sql);
-                    $res->execute(['word' => $word]);
-                    $row = $res->fetch();
-                    if($row === false){
-                        echo "<p>";
-                        echo "Простите, этого слова еще нет в словаре";
-                        echo "</p>";
-                    }
-                    else {
-                        echo "Значение: " . "{$row['meaning']}";
-                    }
-                }
-            }
+            require_once("find_word.php");
         ?>
     </div>
     <br>
@@ -47,39 +24,21 @@
         Добавьте новое слово в словарь:<br>
         <form action=<?=$_SERVER['PHP_SELF']?> method="post">
             Слово: <input type="text" name="new_word"><br>
-            Значение: <input type="text" name="new_word_meaning"><br>
+            Значение: <input type="text" name="new_word_meaning">
             <input type="submit" name="addWord" value="Добавить!">
         </form>
         <?php
-            if(isset($_POST['addWord'])){
-                if(!isset($_POST['new_word']) || empty($_POST['new_word']) 
-                          || !isset($_POST['new_word_meaning']) || empty($_POST['new_word_meaning'])){
-                    echo "<p>";
-                    echo "Вы не ввели слово или его значение!";
-                    echo "</p>";
-                }
-                else{
-                    require_once("db_connect.php");
-
-                    $sql = "SELECT * FROM words WHERE word = '{$_POST['new_word']}'";
-                    $res = $db->prepare($sql);
-                    $res->execute();
-                    if(($res->fetch()) !== false){
-                        echo "<p>";
-                        echo "Это слово уже есть в словаре";
-                        echo "<p>";
-                    }
-                    else{
-                        $sql = "INSERT INTO words (word, meaning) VALUES ('{$_POST['new_word']}', '{$_POST['new_word_meaning']}')";
-                        $db->query($sql);
-                        echo "<p>Ваше слово добавлено!<p>";
-                    }
-                }
-            }
+            require_once("add_word.php");
         ?>
     </div>
-    <form>
-        
+    Удалите слово:<br>
+    <form action=<?=$_SERVER['PHP_SELF']?> method="post">
+        <input type="text" name="word_to_delete">  
+        <input type="submit" name="delete_Word" value="Удалить">
     </form>
+    <?php
+        require_once("delete_word.php");
+    ?>
+    <a href="login.php">Войти</a>
 </body>
 </html>
