@@ -1,9 +1,9 @@
 <?php
+    $status = "DEFAULT";
+    $data = [];
     if(isset($_POST['findWord'])){
         if(!isset($_POST['word']) || empty($_POST['word'])){
-            echo "<p>";
-            echo "Вы не ввели слово!";
-            echo "</p>";
+            $status = "NO_INPUT";
         }
         else{
             require_once("db_connect.php");
@@ -14,13 +14,23 @@
             $res->execute(['word' => $word]);
             $row = $res->fetch();
             if($row === false){
-                echo "<p>";
-                echo "Простите, этого слова еще нет в словаре";
-                echo "</p>";
+                $status = "NO_WORD";
             }
             else {
-                echo "Значение: " . "{$row['meaning']}";
+                $status = "SUCCESS";
+                $data['meaning'] = $row['meaning'];
             }
         }
     }
+
+    require_once("smarty/libs/Smarty.class.php");
+    $smarty = new Smarty();
+    $smarty->setTemplateDir("template");
+    $smarty->setCompileDir('compile');
+    $smarty->setConfigDir('conf');
+    $smarty->setCacheDir('cache');
+
+    $smarty->assign("status", $status);
+    $smarty->assign("data", $data);
+    $smarty->display("index.tpl");
 ?>
